@@ -199,7 +199,7 @@ check_or_download_compose_file()
         echo "magefine-compose.yml not found. Downloading..."
 
         # Use curl to download the file (using a placeholder URL)
-        curl -o "$project_path/magefine-compose.yml" "https://example.com/path/to/magefine-compose.yml"
+        curl -o "$project_path/magefine-compose.yml" "https://raw.githubusercontent.com/Magefine/MageStart/refs/heads/master/docker-compose.yml"
 
         # Check if the download was successful
         if [ -f "$project_path/magefine-compose.yml" ]; then
@@ -210,6 +210,27 @@ check_or_download_compose_file()
         fi
     else
         echo "magefine-compose.yml already exists in the project."
+    fi
+    echo
+}
+
+check_or_download_dockerfile()
+{
+    if [ ! -f "$project_path/magefine.Dockerfile" ]; then
+        echo "magefine.Dockerfile not found. Downloading..."
+
+        # Use curl to download the file (using a placeholder URL)
+        curl -o "$project_path/magefine.Dockerfile" "https://raw.githubusercontent.com/Magefine/MageStart/refs/heads/master/Dockerfile"
+
+        # Check if the download was successful
+        if [ -f "$project_path/magefine.Dockerfile" ]; then
+            echo "magefine.Dockerfile downloaded successfully."
+        else
+            echo "Failed to download magefine.Dockerfile. Please check your internet connection and try again."
+            exit 1
+        fi
+    else
+        echo "magefine.Dockerfile already exists in the project."
     fi
     echo
 }
@@ -338,6 +359,8 @@ setup_existing_project() {
 
         check_or_download_compose_file
 
+        check_or_download_dockerfile
+
         docker_build
 
         docker_up
@@ -369,6 +392,8 @@ setup_new_project() {
     magento_version="${magento_version:-$(magento_default_version)}"
 
     check_or_download_compose_file
+
+    check_or_download_dockerfile
 
     docker_build
 

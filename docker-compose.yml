@@ -3,7 +3,7 @@ services:
     image: ${SERVICE_NAME}_app
     build:
       context: ./
-      dockerfile: Dockerfile
+      dockerfile: magefine.Dockerfile
       args:
         ENV_NAME: ${SERVICE_NAME}
     container_name: ${SERVICE_NAME}_app
