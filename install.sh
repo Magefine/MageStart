@@ -413,6 +413,10 @@ setup_new_project() {
 
     sudo rm -rf ./tmp
 
+    sleep 1
+
+    initialize_database
+
     echo
     sleep 1
 }
