@@ -1,0 +1,61 @@
+services:
+  magefine:
+    image: ${SERVICE_NAME}_app
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        ENV_NAME: ${SERVICE_NAME}
+    container_name: ${SERVICE_NAME}_app
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/magefine:delegated
+      - ./dumps:/workspace/dumps:delegated
+    ports:
+      - "127.0.0.1:${PORT_APP}:80"
+    depends_on:
+      - redis
+      - mysql
+      - elasticsearch
+
+  redis:
+    image: centos/redis-5-centos7
+    restart: unless-stopped
+    container_name: ${SERVICE_NAME}_redis
+    environment:
+      - MASTER=true
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    container_name: ${SERVICE_NAME}_mysql
+    command:
+      --authentication_policy=mysql_native_password
+    ports:
+      - "127.0.0.1:3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_MAX_CONNECTIONS=200
+      - MYSQL_DEFAULT_AUTHENTICATION_PLUGIN=mysql_native_password
+      - MYSQL_INNODB_BUFFER_POOL_SIZE=256MB
+      - MYSQL_SORT_BUFFER_SIZE=4M
+    volumes:
+      - magefine_mysql:/var/lib/mysql
+    ulimits:
+      memlock: 262144
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.2
+    restart: always
+    container_name: ${SERVICE_NAME}_elasticsearch
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+
+volumes:
+  magefine_mysql:
+    driver: local
