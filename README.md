@@ -31,4 +31,4 @@ Hey there, Magento devs! This script is here to make your life a little easier. 
 
 No need to clone anything! Run this one-liner in your terminal and let the magic happen:
 ```bash  
-bash < (curl -s https://raw.githubusercontent.com/Magefine/MageStart/refs/heads/master/install.sh)
+curl -s https://raw.githubusercontent.com/Magefine/MageStart/refs/heads/master/install.sh | bash
