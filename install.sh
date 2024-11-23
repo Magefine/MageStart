@@ -344,6 +344,41 @@ initialize_database() {
     esac
 }
 
+update_hosts_file() {
+    source ./.env
+
+    local hosts_file="/etc/hosts"
+
+    # Vérifie si le domaine est déjà présent dans /etc/hosts
+    if grep -q "$COOKIE_DOMAIN" "$hosts_file"; then
+        echo "The domain '$COOKIE_DOMAIN' is already in $hosts_file."
+    else
+        echo "Adding '$COOKIE_DOMAIN' to $hosts_file..."
+
+        # Ajoute le domaine à la boucle locale (127.0.0.1)
+        echo "127.0.0.1 $COOKIE_DOMAIN" | sudo tee -a "$hosts_file" > /dev/null
+
+        # Confirmation
+        if grep -q "$COOKIE_DOMAIN" "$hosts_file"; then
+            echo "Successfully added '$COOKIE_DOMAIN' to $hosts_file."
+        else
+            echo "Failed to add '$COOKIE_DOMAIN' to your host file. Please check your permissions."
+        fi
+    fi
+}
+
+deploy_dev()
+{
+    source ./.env
+
+    container_name="${SERVICE_NAME}_app"
+
+    docker exec -i ${container_name} bin/magento deploy:mode:set developer
+    docker exec -i ${container_name} chown -R magefine:magefine .
+
+    echo "Setup complete access ${COOKIE_DOMAIN}:${PORT_APP} in your web browser"
+}
+
 # Function to set up an existing project
 setup_existing_project() {
     # Example check to ensure the directory exists
@@ -375,13 +410,15 @@ setup_existing_project() {
         echo
         sleep 1
 
+        initialize_database
+
         echo "Updating host file..."
         update_hosts_file
         echo "Done"
         sleep 1
         echo
 
-        initialize_database
+        deploy_dev
     else
         echo "Directory not found: $project_path. Returning to the main menu."
     fi
@@ -410,7 +447,7 @@ setup_new_project() {
     container_name="${SERVICE_NAME}_app"
 
     echo "Installing Magento $magento_version..."
-    docker exec -it ${container_name} composer create-project --repository=https://repo.magento.com/ magento/project-community-edition="$magento_version" "tmp"
+    docker exec -it ${container_name} composer create-project --prefer-source --repository=https://repo.magento.com/ magento/project-community-edition="$magento_version" "tmp"
 
     sudo mv -i tmp/{.,}* .
 
@@ -431,29 +468,8 @@ setup_new_project() {
     echo "Done"
     sleep 1
     echo
-}
 
-update_hosts_file() {
-    source ./.env
-
-    local hosts_file="/etc/hosts"
-
-    # Vérifie si le domaine est déjà présent dans /etc/hosts
-    if grep -q "$COOKIE_DOMAIN" "$hosts_file"; then
-        echo "The domain '$COOKIE_DOMAIN' is already in $hosts_file."
-    else
-        echo "Adding '$COOKIE_DOMAIN' to $hosts_file..."
-
-        # Ajoute le domaine à la boucle locale (127.0.0.1)
-        echo "127.0.0.1 $COOKIE_DOMAIN" | sudo tee -a "$hosts_file" > /dev/null
-
-        # Confirmation
-        if grep -q "$COOKIE_DOMAIN" "$hosts_file"; then
-            echo "Successfully added '$COOKIE_DOMAIN' to $hosts_file."
-        else
-            echo "Failed to add '$COOKIE_DOMAIN' to your host file. Please check your permissions."
-        fi
-    fi
+    deploy_dev
 }
 
 echo "Welcome to the Magento Installation Script!"
