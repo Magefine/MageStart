@@ -406,7 +406,7 @@ setup_existing_project() {
 
         echo "Installing composer packages..."
         rm -rf vendor/*
-        docker exec -it ${container_name} composer install --prefer-source
+        docker exec -it ${container_name} composer install
         echo
         sleep 1
 
@@ -447,7 +447,7 @@ setup_new_project() {
     container_name="${SERVICE_NAME}_app"
 
     echo "Installing Magento $magento_version..."
-    docker exec -it ${container_name} composer create-project --prefer-source --repository=https://repo.magento.com/ magento/project-community-edition="$magento_version" "tmp"
+    docker exec -it ${container_name} composer create-project --repository=https://repo.magento.com/ magento/project-community-edition="$magento_version" "tmp"
 
     sudo mv -i tmp/{.,}* .
 
