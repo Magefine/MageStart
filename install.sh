@@ -375,6 +375,12 @@ setup_existing_project() {
         echo
         sleep 1
 
+        echo "Updating host file..."
+        update_hosts_file
+        echo "Done"
+        sleep 1
+        echo
+
         initialize_database
     else
         echo "Directory not found: $project_path. Returning to the main menu."
@@ -419,6 +425,35 @@ setup_new_project() {
 
     echo
     sleep 1
+
+    echo "Updating host file..."
+    update_hosts_file
+    echo "Done"
+    sleep 1
+    echo
+}
+
+update_hosts_file() {
+    source ./.env
+
+    local hosts_file="/etc/hosts"
+
+    # Vérifie si le domaine est déjà présent dans /etc/hosts
+    if grep -q "$COOKIE_DOMAIN" "$hosts_file"; then
+        echo "The domain '$COOKIE_DOMAIN' is already in $hosts_file."
+    else
+        echo "Adding '$COOKIE_DOMAIN' to $hosts_file..."
+
+        # Ajoute le domaine à la boucle locale (127.0.0.1)
+        echo "127.0.0.1 $COOKIE_DOMAIN" | sudo tee -a "$hosts_file" > /dev/null
+
+        # Confirmation
+        if grep -q "$COOKIE_DOMAIN" "$hosts_file"; then
+            echo "Successfully added '$COOKIE_DOMAIN' to $hosts_file."
+        else
+            echo "Failed to add '$COOKIE_DOMAIN' to your host file. Please check your permissions."
+        fi
+    fi
 }
 
 echo "Welcome to the Magento Installation Script!"
