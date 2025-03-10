@@ -406,7 +406,7 @@ setup_existing_project() {
 
         echo "Installing composer packages..."
         rm -rf vendor/*
-        docker exec -it ${container_name} composer install
+        docker exec -it ${container_name} composer install --ignore-platform-reqs
         echo
         sleep 1
 
