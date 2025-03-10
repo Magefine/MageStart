@@ -102,8 +102,8 @@ RUN echo "" >> /etc/apache2/sites-available/000-default.conf \
 && echo "        Require all granted" >> /etc/apache2/sites-available/000-default.conf \
 && echo "    </Directory>" >> /etc/apache2/sites-available/000-default.conf \
 && echo "" >> /etc/apache2/sites-available/000-default.conf \
-&& echo "    ErrorLog /var/log/httpd/${ENV_NAME}.local-error_log" >> /etc/apache2/sites-available/000-default.conf \
-&& echo "    CustomLog /var/log/httpd/${ENV_NAME}.local-access_log common" >> /etc/apache2/sites-available/000-default.conf \
+&& echo "    ErrorLog /var/log/apache2/${ENV_NAME}.local-error_log" >> /etc/apache2/sites-available/000-default.conf \
+&& echo "    CustomLog /var/log/apache2/${ENV_NAME}.local-access_log common" >> /etc/apache2/sites-available/000-default.conf \
 && echo "" >> /etc/apache2/sites-available/000-default.conf \
 && echo "</VirtualHost>" >> /etc/apache2/sites-available/000-default.conf
 
