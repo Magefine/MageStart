@@ -116,7 +116,7 @@ RUN echo "#!/bin/bash" > /entrypoint.sh \
 && echo "" >> /entrypoint.sh \
 && echo "chown -R ubuntu:ubuntu /var/www/magefine" >> /entrypoint.sh \
 && echo "" >> /entrypoint.sh \
-&& echo "/usr/sbin/httpd -D FOREGROUND" >> /entrypoint.sh \
+&& echo "apache2ctl -D FOREGROUND" >> /entrypoint.sh \
 && chmod +x /entrypoint.sh
 
 WORKDIR /var/www/magefine
